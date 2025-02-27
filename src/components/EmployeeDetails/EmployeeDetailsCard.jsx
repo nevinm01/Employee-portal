@@ -1,6 +1,9 @@
-import { Card, Row, Col, Button } from "react-bootstrap";
+import { useState } from "react";
+import { Card, Row, Col, Button, Spinner } from "react-bootstrap";
 
 const EmployeeDetailsCard = ({ employee, onEdit, onBack }) => {
+  const [imageLoading, setImageLoading] = useState(true);
+
   return (
     <Card className="shadow-lg p-4">
       <Card.Body>
@@ -14,12 +17,31 @@ const EmployeeDetailsCard = ({ employee, onEdit, onBack }) => {
         <Row>
           <Col md={6}>
             <h5 className="text-primary">Basic Information</h5>
-            <img
-              style={{ width: "180px" }}
-              src={employee.profile_picture}
-              alt="Preview"
-              className="img-fluid mt-2 mb-2"
-            />
+
+            {/* Image with Spinner */}
+            <div
+              style={{ width: "180px", height: "180px", position: "relative" }}
+            >
+              {imageLoading && (
+                <div className="d-flex justify-content-center align-items-center w-100 h-100">
+                  <Spinner animation="border" role="status" variant="primary">
+                    <span className="visually-hidden">Loading...</span>
+                  </Spinner>
+                </div>
+              )}
+              <img
+                style={{
+                  width: "180px",
+                  display: imageLoading ? "none" : "block",
+                }}
+                src={employee.profile_picture}
+                alt="Preview"
+                className="img-fluid mt-2 mb-2"
+                onLoad={() => setImageLoading(false)}
+                onError={() => setImageLoading(false)} // Hide spinner if image fails
+              />
+            </div>
+
             <p>
               <strong>Name:</strong> {employee.name}
             </p>

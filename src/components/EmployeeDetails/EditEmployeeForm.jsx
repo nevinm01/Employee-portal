@@ -1,12 +1,20 @@
 import { Form, Select, RadioGroup, Radio } from "informed";
+import { useState } from "react";
 import useMasterData from "../../hooks/useMasterData";
 import CustomFormInput from "../../CustomFields/CustomFormInput";
 
 const EditEmployeeForm = ({ formData, handleSave, handleCancel }) => {
   const { departments, designations, employmentTypes, error } = useMasterData();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onSubmit = async (values) => {
+    setIsSubmitting(true); // Disable button and show spinner
+    await handleSave(values); // Call the parent function
+    setIsSubmitting(false); // Re-enable button after completion
+  };
 
   return (
-    <Form onSubmit={handleSave} initialValues={formData}>
+    <Form onSubmit={onSubmit} initialValues={formData}>
       {({ formState }) => (
         <>
           {error && <p className="text-danger">Failed to load master data</p>}
@@ -61,12 +69,10 @@ const EditEmployeeForm = ({ formData, handleSave, handleCancel }) => {
             <label>Gender:</label>
             <RadioGroup field="gender">
               <label>
-                <Radio value="1" />
-                Male
+                <Radio value="1" /> Male
               </label>
               <label>
-                <Radio value="2" />
-                Female
+                <Radio value="2" /> Female
               </label>
               <label>
                 <Radio value="3" /> Other
@@ -119,14 +125,26 @@ const EditEmployeeForm = ({ formData, handleSave, handleCancel }) => {
             <button
               className="btn btn-success"
               type="submit"
-              disabled={formState.pristine}
+              disabled={isSubmitting || formState.pristine}
             >
-              Save
+              {isSubmitting ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Saving...
+                </>
+              ) : (
+                "Save"
+              )}
             </button>
             <button
               className="btn btn-danger ms-2"
               type="button"
               onClick={handleCancel}
+              disabled={isSubmitting}
             >
               Cancel
             </button>
